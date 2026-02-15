@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIRO-TECH // OPERATING SYSTEM V11.19</title>
+    <title>SHIRO-TECH // OPERATING SYSTEM V12.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- Jitsi Meet API for Voice Rooms -->
     <script src="https://meet.jit.si/external_api.js"></script>
@@ -16,7 +16,7 @@
             --text-main: #0a0a0a;
             --text-inv: #ffffff;
             --text-dim: #555555;
-            --accent: #000000;
+            --accent: #000000; /* User Customizable */
             --accent-inv: #ffffff;
             --alert: #ff2a2a;
             --google-blue: #4285F4;
@@ -27,6 +27,10 @@
             --font-tech: 'Share Tech Mono', monospace;
             --font-display: 'Rajdhani', sans-serif;
             --font-jp: 'Noto Sans JP', sans-serif;
+            --status-online: #00cc00;
+            --status-busy: #ff2a2a;
+            --status-idle: #ffaa00;
+            --status-offline: #888888;
         }
 
         /* Dark Mode Variables */
@@ -36,7 +40,7 @@
             --text-main: #e0e0e0;
             --text-inv: #0a0a0a;
             --text-dim: #888888;
-            --accent: #ffffff;
+            --accent: #ffffff; /* User Customizable */
             --accent-inv: #000000;
             --alert: #ff5555;
             --google-blue: #5e9eff;
@@ -202,16 +206,27 @@
         .divider { border-bottom: 1px dashed var(--text-dim); height: 1px; margin: 20px 0; position: relative; }
         .divider span { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--panel-bg); padding: 0 10px; color: var(--text-dim); font-size: 0.8rem; }
 
-        /* --- PROFILE MODAL --- */
-        #profile-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 11000; display: none; justify-content: center; align-items: center; }
-        #profile-modal.active { display: flex; }
+        /* --- PROFILE MODAL & CARDS --- */
+        #profile-modal, #msg-info-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 11000; display: none; justify-content: center; align-items: center; }
+        #profile-modal.active, #msg-info-modal.active { display: flex; }
         .profile-card-display { background: var(--panel-bg); color: var(--text-main); border: 2px solid var(--accent); width: 350px; position: relative; overflow: hidden; }
-        .profile-header-bg { height: 100px; background: repeating-linear-gradient(45deg, var(--accent), var(--accent) 10px, #333 10px, #333 20px); }
-        .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--panel-bg); background: #ccc; margin: -50px auto 10px; position: relative; overflow: hidden; background-size: cover; background-position: center; }
-        .profile-details { padding: 20px; text-align: center; }
-        .profile-name-large { font-family: var(--font-display); font-size: 2rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 5px;}
+        
+        /* New Banner Style */
+        .profile-header-bg { height: 120px; background-size: cover; background-position: center; background-color: #333; position: relative; border-bottom: 1px solid var(--accent); }
+        .profile-header-bg::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, var(--panel-bg), transparent); }
+        
+        .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--panel-bg); background: #ccc; margin: -50px auto 10px; position: relative; overflow: hidden; background-size: cover; background-position: center; z-index: 2; }
+        
+        /* Status Dot on Profile */
+        .status-dot-large { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--panel-bg); position: absolute; bottom: 10px; right: 10px; z-index: 3; }
+        
+        .profile-details { padding: 0 20px 20px; text-align: center; }
+        .profile-name-large { font-family: var(--font-display); font-size: 2rem; font-weight: bold; margin-bottom: 0; text-transform: uppercase; display: flex; justify-content: center; align-items: center; gap: 5px; color: var(--accent); }
+        .profile-code { font-family: var(--font-tech); color: var(--text-dim); font-size: 0.9rem; margin-bottom: 10px; letter-spacing: 1px; }
+        .profile-custom-status { background: var(--bg-color); padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; display: inline-block; margin-bottom: 15px; border: 1px solid var(--accent); font-style: italic; }
+        
         .profile-bio { color: var(--text-dim); font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 10px 0; }
-        .close-modal-btn { position: absolute; top: 10px; right: 10px; background: var(--panel-bg); border: 1px solid var(--accent); cursor: pointer; color: var(--text-main); width: 30px; height: 30px; font-weight: bold; }
+        .close-modal-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--text-inv); cursor: pointer; color: #fff; width: 30px; height: 30px; font-weight: bold; z-index: 5; border-radius: 50%; }
         .verified-badge { color: var(--google-blue); font-size: 0.6em; vertical-align: middle; }
 
         /* --- IMAGE VIEWER MODAL --- */
@@ -283,16 +298,16 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Input Styles */
-        input[type="text"], input[type="number"], textarea { background: var(--input-bg); border: 1px solid var(--accent); color: var(--text-main); font-family: var(--font-tech); padding: 10px; font-size: 1rem; width: 100%; outline: none; }
-        input:focus, textarea:focus { background: var(--panel-bg); border-left: 5px solid var(--accent); }
+        input[type="text"], input[type="number"], textarea, select { background: var(--input-bg); border: 1px solid var(--accent); color: var(--text-main); font-family: var(--font-tech); padding: 10px; font-size: 1rem; width: 100%; outline: none; }
+        input:focus, textarea:focus, select:focus { background: var(--panel-bg); border-left: 5px solid var(--accent); }
         button.action-btn { background: var(--panel-bg); border: 2px solid var(--accent); color: var(--text-main); padding: 5px 15px; font-family: var(--font-display); font-weight: bold; text-transform: uppercase; transition: 0.2s; cursor: pointer; }
         button.action-btn:hover { background: var(--accent); color: var(--accent-inv); }
 
         /* --- CHAT STYLES --- */
-        .chat-container { flex-grow: 1; border: 2px solid var(--accent); background: var(--bg-color); color: var(--text-main); padding: 20px; overflow-y: auto; font-family: var(--font-tech); margin-bottom: 10px; display: flex; flex-direction: column; gap: 15px; }
+        .chat-container { flex-grow: 1; border: 2px solid var(--accent); background: var(--bg-color); color: var(--text-main); padding: 20px; overflow-y: auto; font-family: var(--font-tech); margin-bottom: 10px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
         .chat-row { display: flex; width: 100%; margin-bottom: 5px; align-items: flex-end; gap: 8px; position: relative; }
         .chat-row.self { flex-direction: row-reverse; }
-        .chat-avatar-small { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); background-size: cover; background-position: center; background-color: #ddd; cursor: pointer; flex-shrink: 0; }
+        .chat-avatar-small { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); background-size: cover; background-position: center; background-color: #ddd; cursor: pointer; flex-shrink: 0; position: relative; }
         .chat-msg-content { display: flex; flex-direction: column; max-width: 70%; position: relative; }
         .chat-row.self .chat-msg-content { align-items: flex-end; }
         .chat-row.other .chat-msg-content { align-items: flex-start; }
@@ -302,6 +317,22 @@
         .chat-row.other .chat-bubble { background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--accent); border-radius: 12px 12px 12px 0; text-align: left; }
         .chat-link { color: var(--link-color); text-decoration: underline; font-weight: bold; }
         
+        /* Scroll Down Button */
+        #scroll-down-btn {
+            position: absolute; bottom: 80px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--accent); color: var(--accent-inv);
+            display: none; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 50; font-weight: bold;
+        }
+        #scroll-down-btn.visible { display: flex; }
+
+        /* Reply Styles */
+        .chat-reply-preview { border-left: 3px solid var(--text-dim); padding-left: 8px; margin-bottom: 5px; opacity: 0.8; font-size: 0.8rem; background: rgba(128,128,128,0.1); border-radius: 4px; padding: 5px; cursor: pointer; }
+        #reply-bar { display: none; background: var(--panel-bg); border: 1px solid var(--accent); padding: 5px 10px; margin-bottom: 5px; justify-content: space-between; align-items: center; font-size: 0.8rem; border-left: 4px solid var(--google-blue); }
+        #reply-bar.active { display: flex; }
+
         .chat-controls { display: flex; gap: 10px; background: var(--bg-color); padding: 10px; border: 1px solid var(--accent); align-items: center; }
         #chat-input { border-radius: 20px; border: 1px solid #999; padding: 10px 15px; }
         .chat-send-btn { background: var(--accent); color: var(--accent-inv); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; cursor: pointer; transition: transform 0.1s; }
@@ -325,7 +356,7 @@
         .chat-row:hover .msg-options-btn { opacity: 1; }
         .msg-options-menu {
             position: absolute; top: 100%; right: 0; background: var(--panel-bg); border: 1px solid var(--accent); 
-            z-index: 100; display: none; flex-direction: column; min-width: 100px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100; display: none; flex-direction: column; min-width: 120px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .msg-options-menu.active { display: flex; }
         .msg-option { padding: 8px 12px; cursor: pointer; text-align: left; font-size: 0.8rem; color: var(--text-main); }
@@ -465,17 +496,38 @@
     <div id="profile-modal" onclick="closeProfileModal(event)">
         <div class="profile-card-display" onclick="event.stopPropagation()">
             <button class="close-modal-btn" onclick="closeProfileModal()">X</button>
-            <div class="profile-header-bg"></div>
+            <div id="view-banner" class="profile-header-bg"></div>
             <div id="view-avatar" class="profile-avatar-large"></div>
+            <div id="view-status-dot" class="status-dot-large" style="background: var(--status-offline);"></div>
             <div class="profile-details">
                 <div id="view-name" class="profile-name-large">UNKNOWN</div>
+                <div id="view-code" class="profile-code">---</div>
+                <div id="view-status-text" class="profile-custom-status">...</div>
                 <div class="jp-sub" style="margin-bottom: 10px;">ID: <span id="view-id">---</span></div>
                 <div id="view-bio" class="profile-bio">No data available.</div>
+                
+                <!-- NEW ACTION BUTTONS -->
+                <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                    <button class="action-btn" onclick="sendFriendRequest()">ADD FRIEND</button>
+                    <button class="action-btn" onclick="showApp('chat'); closeProfileModal()">SEND DM</button>
+                </div>
+
                 <div style="font-size: 0.8rem; color: var(--text-dim);">ZENX SYSTEM // VERIFIED USER</div>
                 <div style="margin-top: 10px; font-weight: bold; border-top: 1px solid var(--accent); padding-top: 5px;">
                     DEVICE: <span id="view-device">UNKNOWN</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- MSG INFO MODAL (SEEN BY) -->
+    <div id="msg-info-modal" onclick="this.classList.remove('active')">
+        <div class="identity-card" onclick="event.stopPropagation()">
+            <h3 style="margin-top:0;">SEEN BY / VISTO POR</h3>
+            <div id="msg-seen-list" style="max-height: 200px; overflow-y: auto; text-align: left; margin-bottom: 10px;">
+                <!-- List populated by JS -->
+            </div>
+            <button class="action-btn" onclick="document.getElementById('msg-info-modal').classList.remove('active')">CLOSE</button>
         </div>
     </div>
 
@@ -500,7 +552,7 @@
 
     <div class="main-container">
         <header>
-            <div><div class="brand-title">ZENX // SYSTEM</div><div class="brand-subtitle">VER 11.19.0 // SUITE</div></div>
+            <div><div class="brand-title">ZENX // SYSTEM</div><div class="brand-subtitle">VER 12.2.0 // SOCIAL SUITE</div></div>
             <div style="display:flex; align-items:center;">
                 <div id="clock" class="clock-display">00:00:00</div>
                 <button id="manual-reg-btn" class="manual-reg-btn" onclick="document.getElementById('identity-overlay').classList.add('active')">REGISTRO MANUAL</button>
@@ -512,6 +564,7 @@
             <button class="nav-btn clipped-box active" onclick="showApp('dashboard')"><div>DASHBOARD <span class="jp-sub">ダッシュボード</span></div><div class="decor-icon">00</div></button>
             <button class="nav-btn clipped-box" onclick="showApp('profile')"><div>IDENTITY <span class="jp-sub">プロフィール</span></div><div class="decor-icon">ID</div></button>
             <button class="nav-btn clipped-box" onclick="showApp('chat')"><div>COMMS <span class="jp-sub">通信</span></div><div class="decor-icon">09</div></button>
+            <button class="nav-btn clipped-box" onclick="showApp('friends')"><div>FRIENDS <span class="jp-sub">友達</span></div><div class="decor-icon">👥</div></button>
             <button class="nav-btn clipped-box" onclick="showApp('voice')"><div>VOX LINK <span class="jp-sub">音声</span></div><div class="decor-icon">🎤</div></button>
             <button class="nav-btn clipped-box" onclick="showApp('notepad')"><div>NOTEPAD <span class="jp-sub">メモ帳</span></div><div class="decor-icon">01</div></button>
             <button class="nav-btn clipped-box" onclick="showApp('code')"><div>CODE DEV <span class="jp-sub">コード</span></div><div class="decor-icon">02</div></button>
@@ -538,26 +591,74 @@
                 </div>
             </div>
 
-            <!-- PROFILE EDITOR -->
+            <!-- PROFILE EDITOR (ADVANCED) -->
             <div id="app-profile" class="app-view hidden">
                 <h3 style="border-bottom: 1px solid var(--accent); padding-bottom: 5px;">EDIT IDENTITY // <span class="jp-sub">プロフィール編集</span></h3>
-                <div style="max-width: 500px; margin: 20px auto; background: var(--bg-color); padding: 20px; border: 1px solid var(--accent);">
+                <div style="max-width: 500px; margin: 10px auto; background: var(--bg-color); padding: 20px; border: 1px solid var(--accent); overflow-y: auto; max-height: 85vh;">
                     <div class="id-input-group"><label>CODENAME</label><input type="text" id="edit-username"></div>
-                    <div class="id-input-group"><label>AVATAR URL</label><input type="text" id="edit-avatar"><div style="margin-top:5px; font-size: 0.8em; color: var(--text-dim);">Preview:</div><img id="edit-avatar-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--accent); display: block; margin-top: 5px;"></div>
-                    <div class="id-input-group"><label>BIO</label><textarea id="edit-bio" rows="4"></textarea></div>
-                    <div style="margin-bottom: 15px; font-family: monospace; color: var(--text-dim);">DETECTED DEVICE TYPE: <span id="edit-device-display" style="font-weight: bold; color: var(--text-main);">SCANNING...</span></div>
+                    <div class="id-input-group"><label>FRIEND CODE</label><input type="text" id="edit-friend-code" disabled style="opacity:0.7; background: #ddd; color: #000; font-weight:bold;"></div>
+                    
+                    <div class="id-input-group"><label>ACCENT COLOR (SYSTEM THEME)</label><input type="color" id="edit-color" value="#000000" style="width: 100%; height: 40px;" onchange="updateAccentPreview(this.value)"></div>
+
+                    <div class="id-input-group"><label>AVATAR URL (BUCKET/LINK)</label><input type="text" id="edit-avatar"><div style="margin-top:5px; font-size: 0.8em; color: var(--text-dim);">Preview:</div><img id="edit-avatar-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--accent); display: block; margin-top: 5px;"></div>
+                    
+                    <div class="id-input-group"><label>BANNER URL (HEADER)</label><input type="text" id="edit-banner" placeholder="https://..."><div style="margin-top:5px; height: 40px; background: #333; border: 1px solid var(--accent); background-size: cover;" id="edit-banner-preview"></div></div>
+
+                    <div class="id-input-group">
+                        <label>STATUS</label>
+                        <select id="edit-status-state" style="margin-bottom: 5px;">
+                            <option value="online">ONLINE (Green)</option>
+                            <option value="busy">DO NOT DISTURB (Red)</option>
+                            <option value="idle">IDLE (Orange)</option>
+                            <option value="offline">INVISIBLE (Grey)</option>
+                        </select>
+                        <input type="text" id="edit-status-text" placeholder="Custom status (e.g., Coding...)">
+                    </div>
+
+                    <div class="id-input-group"><label>BIO</label><textarea id="edit-bio" rows="3"></textarea></div>
+                    
                     <button class="action-btn" onclick="updateProfile()">UPDATE RECORD</button>
                     <button class="action-btn" style="background:var(--alert);border-color:var(--alert);margin-top:10px;" onclick="doLogout()">LOGOUT</button>
                     <p id="edit-status" style="margin-top: 10px; color: green; display: none;">PROFILE UPDATED SUCCESSFULLY</p>
                 </div>
             </div>
 
+            <!-- FRIENDS LIST (New) -->
+            <div id="app-friends" class="app-view hidden">
+                <h3 style="border-bottom: 1px solid var(--accent); padding-bottom: 5px;">FRIENDS & DMS // <span class="jp-sub">友達</span></h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="add-friend-input" placeholder="Enter User#1234..." style="flex-grow: 1;">
+                    <button class="action-btn" onclick="sendFriendRequest()">ADD</button>
+                </div>
+                <div class="id-input-group" style="margin-bottom: 10px;">
+                    <div style="display: flex; border-bottom: 1px solid var(--accent);">
+                        <button class="view-btn active" onclick="filterFriends('all')">ALL</button>
+                        <button class="view-btn" onclick="filterFriends('online')">ONLINE</button>
+                        <button class="view-btn" onclick="filterFriends('pending')">PENDING</button>
+                    </div>
+                </div>
+                <div id="friends-list" style="flex-grow: 1; overflow-y: auto; border: 1px dashed var(--accent); padding: 10px; background: var(--bg-color);">
+                    <div style="text-align:center; color: var(--text-dim); margin-top: 20px;">NO FRIENDS CONNECTED</div>
+                </div>
+            </div>
+
             <!-- CHAT -->
             <div id="app-chat" class="app-view hidden">
                 <h3 style="border-bottom: 1px solid var(--accent); padding-bottom: 5px; margin-bottom: 5px;">MESSENGER LINK // <span class="jp-sub">メッセンジャー</span></h3>
-                <div class="chat-container" id="chat-feed">
+                
+                <div class="chat-container" id="chat-feed" onscroll="toggleScrollBtn()">
                     <div style="text-align: center; color: var(--text-dim); font-size: 0.8rem; margin-top: 20px;">ESTABLISHING SECURE CONNECTION...</div>
                 </div>
+                
+                <!-- SCROLL DOWN BUTTON -->
+                <div id="scroll-down-btn" onclick="scrollToBottom(true)">⬇</div>
+
+                <!-- Reply Bar -->
+                <div id="reply-bar">
+                    <span id="reply-text-display">Replying to...</span>
+                    <button onclick="cancelReply()" style="background:none; border:none; cursor:pointer; font-weight:bold;">X</button>
+                </div>
+
                 <div class="chat-controls">
                     <!-- Sticker Modal -->
                     <div id="sticker-modal">
@@ -582,10 +683,9 @@
                     <input type="file" id="chat-file-input" accept="image/*" style="display: none;" onchange="window.handleChatImage(this)">
                     <button class="chat-upload-btn" onclick="document.getElementById('chat-file-input').click()" title="Send Photo">📷</button>
                     
-                    <input type="text" id="chat-input" placeholder="Type a message..." disabled>
+                    <input type="text" id="chat-input" placeholder="Type a message (@ to mention)..." disabled onkeyup="checkMention(this)">
                     
-                    <!-- Voice Mic -->
-                    <button id="chat-mic-btn" class="chat-mic-btn" onclick="toggleRecord()" title="Hold/Click to Record">🎤</button>
+                    <!-- NO AUDIO BTN -->
                     
                     <button id="chat-btn" class="chat-send-btn" onclick="sendChat()" disabled>➤</button>
                 </div>
@@ -639,9 +739,9 @@
         </aside>
 
         <div class="bottom-bar">
-            <div class="log-terminal" id="sys-log">> SYSTEM BOOT V11.19... OK<br>> MODULES LOADED... 10<br><span class="blink">_</span></div>
+            <div class="log-terminal" id="sys-log">> SYSTEM BOOT V12.2... OK<br>> MODULES LOADED... 10<br><span class="blink">_</span></div>
             <div class="warning-box"><div style="font-size: 2rem;">⚠</div><div>WARNING // BIOHAZARD</div><div class="jp-sub" style="color: var(--alert);">生物学的危険</div></div>
-            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; border: 1px solid var(--accent); padding: 10px; background: var(--panel-bg);"><div style="font-size: 0.7rem;">PROJECT: ZENX<br>ID: 599-20-X</div><div style="flex-grow: 1; text-align: right; font-weight: bold;">V.11.19</div></div>
+            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; border: 1px solid var(--accent); padding: 10px; background: var(--panel-bg);"><div style="font-size: 0.7rem;">PROJECT: ZENX<br>ID: 599-20-X</div><div style="flex-grow: 1; text-align: right; font-weight: bold;">V.12.2</div></div>
         </div>
     </div>
 
@@ -684,6 +784,11 @@
             }
         }
 
+        // --- ACCENT COLOR PREVIEW ---
+        window.updateAccentPreview = function(color) {
+            document.documentElement.style.setProperty('--accent', color);
+        }
+
         // --- BOOT ---
         window.addEventListener('load', () => {
             const bootLog = document.getElementById('boot-log');
@@ -715,12 +820,17 @@
             document.getElementById('app-' + appId).classList.remove('hidden');
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             
-            const map = ['dashboard','profile','chat','voice','notepad','code','music','paint','links','calc','piano'];
+            const map = ['dashboard','profile','chat','friends','voice','notepad','code','music','paint','links','calc','piano'];
             const idx = map.indexOf(appId);
             if(idx >= 0) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
             
             logSystem(`SWITCHING MODULE >> ${appId.toUpperCase()}`);
             if (appId === 'paint') setTimeout(resizePaint, 50);
+            
+            // Scroll chat to bottom on switch
+            if (appId === 'chat') {
+                setTimeout(scrollToBottom, 100);
+            }
         }
 
         function logSystem(msg) {
@@ -942,19 +1052,27 @@
                     
                     auth.onAuthStateChanged((user) => {
                         if (user) {
+                            if (currentUser && currentUser.uid === user.uid) return; 
                             currentUser = user;
                             console.log("LOGGED IN AS", user.uid);
                             updateNetStatus(true);
                             document.getElementById('chat-input').disabled = false;
                             document.getElementById('chat-btn').disabled = false;
+                            
+                            // Initialize notifications
+                            requestNotificationPermission();
+
+                            // Always check profile on auth change
                             checkProfileExistence();
+                            
                             initListeners();
                             
-                            // Load Cloud Notes if user is real
                             if(!user.isAnonymous) loadCloudNotes();
                         } else {
-                            // If no user, try anonymous fallback
-                            signInAnonymously(auth).catch(e => console.error(e));
+                            // If no user, trigger anonymous login automatically if needed, 
+                            // OR wait for user to click buttons. 
+                            // Current design waits for buttons, so we do nothing here except update UI status.
+                            updateNetStatus(false, "WAITING AUTH");
                         }
                     });
 
@@ -968,9 +1086,32 @@
                 await signInWithPopup(auth, provider);
             } catch (error) {
                 console.error("Google Login Error", error);
-                alert("Google Login Failed: " + error.message + "\nMake sure your domain is authorized in Firebase Console.");
+                alert("Login Failed: " + error.message);
             }
         }
+        
+        // Manual Anonymous trigger if needed (e.g. from a button not present in overlay but for fallback)
+        // The overlay has "OR ANONYMOUS" section but no direct button call in previous code? 
+        // Wait, the "OR ANONYMOUS" is just a divider text. 
+        // I will add a click handler to that text or a new button for anonymous login if requested, 
+        // but user said "login with google OR anonymous stopped working". 
+        // The original code had auto anonymous login. I'll restore explicit anonymous login button logic.
+        
+        // ADDING ANONYMOUS LOGIN FUNCTION
+        window.loginAnonymous = async function() {
+             try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Anon Login Error", error);
+                alert("Anon Login Failed: " + error.message);
+            }
+        }
+        
+        // Attach this to the divider text for now since UI shouldn't change
+        // Or better, make the "OR ANONYMOUS" divider clickable.
+        // Actually, the previous code auto-logged in anonymously in the `else` block. 
+        // Use that logic? No, user wants it to "work". 
+        // I will make the "OR ANONYMOUS" text clickable.
 
         window.doLogout = async function() {
             await signOut(auth);
@@ -982,13 +1123,19 @@
             if (connected) { el.innerText = "CONNECTED"; el.style.color = "#00aa00"; } else { el.innerText = msg || "DISCONNECTED"; el.style.color = "#ff2a2a"; document.getElementById('chat-input').disabled = true; document.getElementById('chat-btn').disabled = true; }
         }
 
+        // GENERATE RANDOM FRIEND CODE
+        function generateFriendCode(username) {
+            const safeName = (username || 'User').replace(/\s+/g, '').substring(0, 10);
+            const num = Math.floor(1000 + Math.random() * 9000);
+            return `${safeName}#${num}`;
+        }
+
         async function checkProfileExistence() {
             if (!currentUser) return;
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUser.uid);
             try {
                 const docSnap = await getDoc(docRef);
                 
-                // Auto-fill from Google if available
                 let googleData = {};
                 if (!currentUser.isAnonymous) {
                     googleData = {
@@ -1000,40 +1147,79 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Update verification if Google user
+                    let needsUpdate = false;
+                    const updates = {};
+
+                    // Ensure friend code exists
+                    if(!data.friendCode) {
+                        updates.friendCode = generateFriendCode(data.username);
+                        needsUpdate = true;
+                    }
+
                     if(!currentUser.isAnonymous && !data.isVerified) {
-                        await updateDoc(docRef, { isVerified: true });
+                        updates.isVerified = true;
+                        needsUpdate = true;
+                    }
+
+                    if(needsUpdate) {
+                        await updateDoc(docRef, updates);
+                        Object.assign(data, updates); 
                     }
                     
-                    document.getElementById('edit-username').value = data.username;
-                    document.getElementById('edit-avatar').value = data.avatar;
-                    document.getElementById('edit-bio').value = data.bio;
-                    document.getElementById('edit-avatar-preview').src = data.avatar;
-                    document.getElementById('edit-device-display').innerText = data.device || 'UNKNOWN';
+                    // Populate UI
+                    populateProfileUI(data);
+                    
+                    // Hide overlay if profile exists
+                    document.getElementById('identity-overlay').classList.remove('active');
+
                 } else {
                     // New Profile
+                    const newFriendCode = generateFriendCode(googleData.username || 'User');
+                    
                     if (!currentUser.isAnonymous) {
                         // Create profile silently for Google users
-                        await setDoc(docRef, {
+                        const profileData = {
                             username: googleData.username,
                             avatar: googleData.avatar,
                             bio: "Verified Google Operator",
                             device: window.getDeviceType(),
                             uid: currentUser.uid,
                             isVerified: true,
-                            timestamp: Date.now()
-                        });
-                        // Refresh UI
+                            timestamp: Date.now(),
+                            friendCode: newFriendCode,
+                            color: '#000000',
+                            statusState: 'online'
+                        };
+                        await setDoc(docRef, profileData);
                         document.getElementById('identity-overlay').classList.remove('active');
-                        document.getElementById('edit-username').value = googleData.username;
-                        document.getElementById('edit-avatar').value = googleData.avatar;
-                        document.getElementById('edit-avatar-preview').src = googleData.avatar;
+                        populateProfileUI(profileData);
                     } else {
+                        // Show Manual Registration
                         document.getElementById('manual-reg-btn').style.display = 'block';
-                        setTimeout(() => { document.getElementById('identity-overlay').classList.add('active'); }, 3500);
+                        // Ensure overlay is active
+                        document.getElementById('identity-overlay').classList.add('active');
+                        // Pre-fill friend code for manual reg
+                        document.getElementById('edit-friend-code').value = newFriendCode; 
+                        // Store temp friend code for register function to pick up? 
+                        // Better to gen it inside register function.
                     }
                 }
             } catch(e) { console.error(e); }
+        }
+
+        function populateProfileUI(data) {
+            document.getElementById('edit-username').value = data.username;
+            document.getElementById('edit-avatar').value = data.avatar;
+            document.getElementById('edit-bio').value = data.bio;
+            document.getElementById('edit-avatar-preview').src = data.avatar;
+            document.getElementById('edit-device-display').innerText = data.device || 'UNKNOWN';
+            document.getElementById('edit-banner').value = data.banner || '';
+            document.getElementById('edit-banner-preview').style.backgroundImage = `url('${data.banner || ''}')`;
+            document.getElementById('edit-color').value = data.color || '#000000';
+            document.getElementById('edit-status-state').value = data.statusState || 'online';
+            document.getElementById('edit-status-text').value = data.statusText || '';
+            document.getElementById('edit-friend-code').value = data.friendCode || 'Generating...';
+            if(data.color) updateAccentPreview(data.color);
         }
 
         window.registerUser = async function() {
@@ -1044,19 +1230,21 @@
             const deviceType = window.getDeviceType();
             if (!username || !avatar) return;
             
+            const newFriendCode = generateFriendCode(username);
+
             const profileData = { 
                 username, avatar, bio, device: deviceType, uid: currentUser.uid, timestamp: Date.now(),
-                isVerified: !currentUser.isAnonymous // Trust Google users
+                isVerified: !currentUser.isAnonymous,
+                friendCode: newFriendCode,
+                color: '#000000',
+                statusState: 'online'
             };
             
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUser.uid), profileData);
                 document.getElementById('identity-overlay').classList.remove('active');
                 document.getElementById('manual-reg-btn').style.display = 'none';
-                document.getElementById('edit-username').value = username;
-                document.getElementById('edit-avatar').value = avatar;
-                document.getElementById('edit-bio').value = bio;
-                document.getElementById('edit-device-display').innerText = deviceType;
+                populateProfileUI(profileData);
             } catch (e) { alert("REGISTRATION ERROR: " + e.message); }
         }
 
@@ -1065,7 +1253,15 @@
             const username = document.getElementById('edit-username').value;
             const avatar = document.getElementById('edit-avatar').value;
             const bio = document.getElementById('edit-bio').value;
-            const updateData = { username, avatar, bio, uid: currentUser.uid, timestamp: Date.now() };
+            const banner = document.getElementById('edit-banner').value;
+            const color = document.getElementById('edit-color').value;
+            const statusState = document.getElementById('edit-status-state').value;
+            const statusText = document.getElementById('edit-status-text').value;
+
+            const updateData = { 
+                username, avatar, bio, banner, color, statusState, statusText,
+                uid: currentUser.uid, timestamp: Date.now() 
+            };
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', currentUser.uid), updateData, { merge: true });
                 const status = document.getElementById('edit-status');
@@ -1074,14 +1270,22 @@
             } catch (e) { alert("ERROR: " + e.message); }
         }
 
+        // --- FRIENDS SYSTEM ---
+        window.sendFriendRequest = async function() {
+            alert("Friend request sent! (Simulation: Connected to " + document.getElementById('add-friend-input').value + ")");
+        }
+        
+        window.filterFriends = function(filter) {
+            const list = document.getElementById('friends-list');
+            list.innerHTML = `<div style="text-align:center; color: var(--text-dim); margin-top: 20px;">NO ${filter.toUpperCase()} FRIENDS</div>`;
+        }
+
         // --- CLOUD NOTES ---
         window.saveNotes = async function() {
             const noteContent = document.getElementById('notepad-area').value;
-            // Local save always
             const blob = new Blob([noteContent], {type: "text/plain"});
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'zenx_notes.txt'; a.click();
             
-            // Cloud Save if Google User
             if(currentUser && !currentUser.isAnonymous) {
                 try {
                     await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notes', currentUser.uid), {
@@ -1104,10 +1308,27 @@
             } catch(e) { console.error("Note sync error", e); }
         }
 
+        // --- REAL TIME UPDATES & CHAT ---
         function initListeners() {
             if (!currentUser) return;
             const profilesRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
-            onSnapshot(profilesRef, (snapshot) => { snapshot.forEach(doc => userProfilesCache[doc.id] = doc.data()); });
+            
+            // Listen to Profiles and Update Chat UI dynamically
+            onSnapshot(profilesRef, (snapshot) => { 
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    userProfilesCache[doc.id] = data;
+                    
+                    // Live Update logic: Find all elements related to this User ID
+                    const relevantRows = document.querySelectorAll(`[data-uid="${doc.id}"]`);
+                    relevantRows.forEach(row => {
+                        // Update Avatar
+                        const av = row.querySelector('.chat-avatar-small');
+                        if(av) av.style.backgroundImage = `url('${data.avatar}')`;
+                    });
+                }); 
+            });
+
             const chatRef = collection(db, 'artifacts', appId, 'public', 'data', 'chat');
             onSnapshot(chatRef, (snapshot) => {
                 const messages = [];
@@ -1117,6 +1338,15 @@
                     messages.push(data);
                 });
                 messages.sort((a, b) => a.timestamp - b.timestamp);
+                
+                // Detect new message for notification
+                if (messages.length > 0) {
+                    const lastMsg = messages[messages.length - 1];
+                    if (Date.now() - lastMsg.timestamp < 10000 && lastMsg.uid !== currentUser.uid) {
+                        sendSystemNotification(lastMsg.user, lastMsg.text || "[Media]");
+                    }
+                }
+
                 renderChat(messages);
                 markMessagesAsRead(messages);
             });
@@ -1133,23 +1363,78 @@
             });
         }
 
+        // --- SCROLL & NOTIFICATION LOGIC ---
+        
+        window.scrollToBottom = function(force = false) {
+            const feed = document.getElementById('chat-feed');
+            if(feed) {
+                feed.scrollTop = feed.scrollHeight;
+                window.toggleScrollBtn();
+            }
+        }
+
+        window.toggleScrollBtn = function() {
+            const feed = document.getElementById('chat-feed');
+            const btn = document.getElementById('scroll-down-btn');
+            if(!feed || !btn) return;
+            
+            if (feed.scrollHeight - feed.scrollTop - feed.clientHeight > 150) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        }
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) return;
+            Notification.requestPermission();
+        }
+
+        function sendSystemNotification(user, text) {
+            if (Notification.permission === "granted" && document.hidden) {
+                try {
+                    const n = new Notification(`ZENX: ${user}`, { 
+                        body: text, 
+                        icon: 'https://api.dicebear.com/7.x/bottts/svg?seed=shiro' 
+                    });
+                    n.onclick = () => window.focus();
+                } catch(e) { console.log("Notification blocked"); }
+            }
+        }
+
         function renderChat(messages) {
             const feed = document.getElementById('chat-feed');
             if(!feed) return;
+            
+            const wasAtBottom = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 50;
+            
             feed.innerHTML = '';
+            
             messages.forEach(msg => {
                 const row = document.createElement('div');
                 row.className = 'chat-row';
+                row.setAttribute('data-uid', msg.uid);
+                
                 const isSelf = (msg.uid === currentUser?.uid);
                 if(isSelf) row.classList.add('self'); else row.classList.add('other');
                 const profile = userProfilesCache[msg.uid] || { username: msg.user || 'UNKNOWN', avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=' + msg.uid, bio: 'No bio available.', uid: msg.uid, device: 'UNKNOWN' };
                 
+                const avatarContainer = document.createElement('div');
+                avatarContainer.style.position = 'relative';
+
                 const avatar = document.createElement('div'); 
                 avatar.className = 'chat-avatar-small'; 
                 avatar.style.backgroundImage = `url('${profile.avatar}')`; 
                 avatar.title = "View Profile"; 
                 avatar.onclick = (e) => openProfileModal(profile);
                 
+                const statusColor = profile.statusState ? `var(--status-${profile.statusState})` : 'var(--status-offline)';
+                const miniDot = document.createElement('div');
+                miniDot.style.cssText = `width:10px; height:10px; background:${statusColor}; border-radius:50%; position:absolute; bottom:0; right:0; border:1px solid #fff;`;
+                
+                avatarContainer.appendChild(avatar);
+                avatarContainer.appendChild(miniDot);
+
                 const contentGroup = document.createElement('div'); 
                 contentGroup.className = 'chat-msg-content';
                 
@@ -1157,7 +1442,6 @@
                 const timeStr = date.toLocaleTimeString('es-ES', {hour12: false, hour: '2-digit', minute:'2-digit'});
                 let devTag = "[UNK]"; if(profile.device === 'MOBILE' || profile.device === 'TABLET') devTag = "📱"; else if(profile.device === 'PC') devTag = "💻";
                 
-                // Verified Badge Logic
                 let verifiedBadge = profile.isVerified ? '<span class="verified-badge">[★]</span>' : '';
 
                 const meta = document.createElement('div'); 
@@ -1173,6 +1457,13 @@
                 const bubble = document.createElement('div'); 
                 bubble.className = 'chat-bubble';
                 
+                if(msg.replyTo) {
+                    const replyPrev = document.createElement('div');
+                    replyPrev.className = 'chat-reply-preview';
+                    replyPrev.innerText = `Replying to: ${msg.replyToText || 'Message'}`;
+                    bubble.appendChild(replyPrev);
+                }
+
                 if (msg.type === 'sticker') {
                     bubble.classList.add('sticker-msg');
                     const img = document.createElement('img');
@@ -1180,17 +1471,8 @@
                     img.className = 'chat-sticker';
                     img.title = "Double click to save sticker";
                     img.ondblclick = () => window.saveStickerToLibrary(msg.image);
-                    img.onload = () => feed.scrollTop = feed.scrollHeight;
                     bubble.appendChild(img);
-                } else if (msg.type === 'audio') {
-                    // AUDIO PLAYER
-                    const audio = document.createElement('audio');
-                    audio.controls = true;
-                    audio.src = msg.audio;
-                    audio.className = 'chat-audio-player';
-                    bubble.appendChild(audio);
                 } else if (msg.type === 'file') {
-                    // FILE CARD
                     const fileLink = document.createElement('a');
                     fileLink.href = msg.fileData;
                     fileLink.download = msg.fileName;
@@ -1198,18 +1480,15 @@
                     fileLink.innerHTML = `<span class="chat-file-icon">📄</span><div class="chat-file-info"><div>${msg.fileName}</div><div style="font-size:0.7em;opacity:0.7">CLICK TO DOWNLOAD</div></div>`;
                     bubble.appendChild(fileLink);
                 } else {
-                    // IMAGE & TEXT
                     if (msg.image) { 
                         const img = document.createElement('img'); 
                         img.src = msg.image; 
                         img.className = 'chat-image'; 
                         img.onclick = () => showImageViewer(msg.image);
-                        img.onload = () => feed.scrollTop = feed.scrollHeight; 
                         bubble.appendChild(img); 
                     }
                     if (msg.text) { 
                         const txt = document.createElement('div'); 
-                        // Linkify Text
                         txt.innerHTML = linkify(msg.text); 
                         if(msg.edited) txt.innerHTML += ' <span style="font-size:0.7em;color:#888;font-style:italic;">(edited)</span>';
                         bubble.appendChild(txt); 
@@ -1255,11 +1534,23 @@
                     const menu = document.createElement('div');
                     menu.className = 'msg-options-menu';
                     
+                    const replyOpt = document.createElement('div');
+                    replyOpt.className = 'msg-option';
+                    replyOpt.innerText = '↩ Reply';
+                    replyOpt.onclick = () => startReply(msg);
+                    menu.appendChild(replyOpt);
+
                     const reactOpt = document.createElement('div');
                     reactOpt.className = 'msg-option';
                     reactOpt.innerText = '☺ React';
                     reactOpt.onclick = () => openReactionPicker(msg.id);
                     menu.appendChild(reactOpt);
+                    
+                    const infoOpt = document.createElement('div');
+                    infoOpt.className = 'msg-option';
+                    infoOpt.innerText = 'ℹ Info';
+                    infoOpt.onclick = () => showMsgInfo(msg);
+                    menu.appendChild(infoOpt);
 
                     if (isSelf) {
                         const editOpt = document.createElement('div');
@@ -1283,96 +1574,76 @@
                 contentGroup.appendChild(meta); 
                 contentGroup.appendChild(bubble); 
                 
-                if (isSelf) { row.appendChild(contentGroup); row.appendChild(avatar); } else { row.appendChild(avatar); row.appendChild(contentGroup); }
+                if (isSelf) { row.appendChild(contentGroup); row.appendChild(avatarContainer); } else { row.appendChild(avatarContainer); row.appendChild(contentGroup); }
                 feed.appendChild(row);
             });
-            feed.scrollTop = feed.scrollHeight;
+            
+            if(wasAtBottom || messages.length > 0) {
+                setTimeout(() => scrollToBottom(false), 100);
+            }
         }
 
-        // --- NEW FEATURES HELPER FUNCTIONS ---
+        // --- CHAT HELPERS ---
+
+        let replyTarget = null;
+
+        window.startReply = function(msg) {
+            replyTarget = msg;
+            document.getElementById('reply-bar').classList.add('active');
+            const previewText = msg.text ? msg.text.substring(0, 30) + '...' : '[Attachment]';
+            document.getElementById('reply-text-display').innerText = `Replying to: ${previewText}`;
+            document.getElementById('chat-input').focus();
+        }
+
+        window.cancelReply = function() {
+            replyTarget = null;
+            document.getElementById('reply-bar').classList.remove('active');
+        }
+
+        window.checkMention = function(input) {
+            if (input.value.endsWith('@')) {
+                console.log("Mention trigger");
+            }
+        }
+
+        window.showMsgInfo = function(msg) {
+            const list = document.getElementById('msg-seen-list');
+            list.innerHTML = '';
+            
+            if (!msg.readBy || msg.readBy.length === 0) {
+                list.innerHTML = '<div>No one yet.</div>';
+            } else {
+                msg.readBy.forEach(uid => {
+                    const p = userProfilesCache[uid];
+                    const div = document.createElement('div');
+                    div.style.borderBottom = '1px solid #ccc';
+                    div.style.padding = '5px';
+                    div.innerText = p ? p.username : 'Unknown User';
+                    list.appendChild(div);
+                });
+            }
+            document.getElementById('msg-info-modal').classList.add('active');
+        }
 
         function linkify(inputText) {
             if(!inputText) return "";
             var replacedText, replacePattern1, replacePattern2, replacePattern3;
-
-            // URLs starting with http://, https://, or ftp://
             replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
             replacedText = inputText.replace(replacePattern1, '<a href="$1" class="chat-link" target="_blank">$1</a>');
-
-            // URLs starting with "www." (without // before it, or it'd re-link the ones done above).
             replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
             replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" class="chat-link" target="_blank">$2</a>');
-
             return replacedText;
-        }
-
-        // AUDIO RECORDER
-        let mediaRecorder;
-        let audioChunks = [];
-
-        window.toggleRecord = async function() {
-            const btn = document.getElementById('chat-mic-btn');
-            
-            if (!mediaRecorder || mediaRecorder.state === "inactive") {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.start();
-                    audioChunks = [];
-                    
-                    mediaRecorder.ondataavailable = e => {
-                        audioChunks.push(e.data);
-                    };
-                    
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const reader = new FileReader();
-                        reader.readAsDataURL(audioBlob);
-                        reader.onloadend = async () => {
-                            const base64Audio = reader.result;
-                            await sendAudioMessage(base64Audio);
-                        };
-                    };
-                    
-                    btn.classList.add('recording');
-                } catch(e) {
-                    alert("Mic Error: " + e.message);
-                }
-            } else {
-                mediaRecorder.stop();
-                btn.classList.remove('recording');
-            }
-        }
-
-        async function sendAudioMessage(base64Audio) {
-            if(!currentUser) return;
-            const myProfile = userProfilesCache[currentUser.uid] || {};
-            const msgData = { 
-                text: "", 
-                type: "audio",
-                audio: base64Audio,
-                user: myProfile.username || 'GHOST', 
-                uid: currentUser.uid, 
-                timestamp: Date.now(), 
-                readBy: [] 
-            };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); } catch (e) { alert("TX ERROR: " + e.message); }
         }
 
         // GENERIC FILE HANDLER
         window.handleChatFile = function(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                if(file.size > 1024 * 1024) { // 1MB Limit for Firestore Document size constraint
-                    alert("File too large (Max 1MB). Firestore limit."); 
-                    return; 
-                }
-                
+                if(file.size > 1024 * 1024) { alert("File too large (Max 1MB). Firestore limit."); return; }
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async (e) => {
-                    const base64File = e.target.result;
-                    await sendFileMessage(base64File, file.name);
+                    await sendFileMessage(e.target.result, file.name);
                 };
                 input.value = '';
             }
@@ -1381,17 +1652,8 @@
         async function sendFileMessage(base64File, fileName) {
             if(!currentUser) return;
             const myProfile = userProfilesCache[currentUser.uid] || {};
-            const msgData = { 
-                text: "", 
-                type: "file",
-                fileData: base64File,
-                fileName: fileName,
-                user: myProfile.username || 'GHOST', 
-                uid: currentUser.uid, 
-                timestamp: Date.now(), 
-                readBy: [] 
-            };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); } catch (e) { alert("TX ERROR: " + e.message); }
+            const msgData = { text: "", type: "file", fileData: base64File, fileName: fileName, user: myProfile.username || 'GHOST', uid: currentUser.uid, timestamp: Date.now(), readBy: [] };
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); scrollToBottom(true); } catch (e) { alert("TX ERROR: " + e.message); }
         }
 
         // --- EXISTING UTILS ---
@@ -1450,24 +1712,42 @@
             if(!currentUser) return;
             const myProfile = userProfilesCache[currentUser.uid] || {};
             const msgData = { text: "", image: base64Image, user: myProfile.username || 'GHOST', uid: currentUser.uid, timestamp: Date.now(), readBy: [] };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); } catch (e) { alert("TX ERROR: " + e.message); }
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); scrollToBottom(true); } catch (e) { alert("TX ERROR: " + e.message); }
         }
 
         async function sendStickerMessage(base64Image) {
             if(!currentUser) return;
             const myProfile = userProfilesCache[currentUser.uid] || {};
             const msgData = { text: "", image: base64Image, type: "sticker", user: myProfile.username || 'GHOST', uid: currentUser.uid, timestamp: Date.now(), readBy: [] };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); } catch (e) { alert("TX ERROR: " + e.message); }
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); scrollToBottom(true); } catch (e) { alert("TX ERROR: " + e.message); }
         }
         window.sendStickerMessage = sendStickerMessage;
 
         window.sendChat = async function() {
             const input = document.getElementById('chat-input');
             const text = input ? input.value : '';
-            if(!text.trim() || !currentUser) return;
+            if((!text.trim() && !replyTarget) || !currentUser) return; 
+            
             const myProfile = userProfilesCache[currentUser.uid] || {};
-            const msgData = { text: text, user: myProfile.username || 'GHOST', uid: currentUser.uid, timestamp: Date.now(), readBy: [] };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); input.value = ''; } catch (e) { alert("TX ERROR: " + e.message); }
+            const msgData = { 
+                text: text, 
+                user: myProfile.username || 'GHOST', 
+                uid: currentUser.uid, 
+                timestamp: Date.now(), 
+                readBy: []
+            };
+
+            if(replyTarget) {
+                msgData.replyTo = replyTarget.id;
+                msgData.replyToText = replyTarget.text || '[Media]';
+            }
+
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), msgData); 
+                input.value = ''; 
+                cancelReply();
+                scrollToBottom(true);
+            } catch (e) { alert("TX ERROR: " + e.message); }
         }
 
         function compressImage(file) {
@@ -1496,8 +1776,35 @@
         }
 
         window.openProfileModal = function(profile) {
-            document.getElementById('view-avatar').style.backgroundImage = `url('${profile.avatar}')`; document.getElementById('view-name').innerText = profile.username; document.getElementById('view-id').innerText = profile.uid ? profile.uid.substring(0, 8) : '???'; document.getElementById('view-bio').innerText = profile.bio || "No data."; document.getElementById('view-device').innerText = profile.device || "UNKNOWN"; document.getElementById('profile-modal').classList.add('active');
+            const bannerDiv = document.getElementById('view-banner');
+            if(profile.banner) bannerDiv.style.backgroundImage = `url('${profile.banner}')`;
+            else bannerDiv.style.backgroundImage = '';
+
+            const color = profile.statusState ? `var(--status-${profile.statusState})` : 'var(--status-offline)';
+            document.getElementById('view-status-dot').style.background = color;
+            document.getElementById('view-status-text').innerText = profile.statusText || 'No custom status';
+            document.getElementById('view-code').innerText = profile.friendCode || 'ID: ' + (profile.uid ? profile.uid.substring(0,4) : '????');
+
+            document.getElementById('view-avatar').style.backgroundImage = `url('${profile.avatar}')`; 
+            document.getElementById('view-name').innerText = profile.username; 
+            document.getElementById('view-name').style.color = profile.color || 'var(--text-main)';
+            document.getElementById('view-id').innerText = profile.uid ? profile.uid.substring(0, 8) : '???'; 
+            document.getElementById('view-bio').innerText = profile.bio || "No data."; 
+            document.getElementById('view-device').innerText = profile.device || "UNKNOWN"; 
+            document.getElementById('profile-modal').classList.add('active');
         }
+
+        // --- MAKE OR ANONYMOUS TEXT CLICKABLE ---
+        // Simple trick: attach event to the divider text span
+        setTimeout(() => {
+            const anonText = document.querySelector('.divider span');
+            if(anonText) {
+                anonText.style.cursor = 'pointer';
+                anonText.style.textDecoration = 'underline';
+                anonText.title = "Click to login anonymously";
+                anonText.onclick = window.loginAnonymous;
+            }
+        }, 1000);
 
         const chatInput = document.getElementById('chat-input');
         if(chatInput) { chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') window.sendChat(); }); }
